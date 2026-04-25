@@ -1,162 +1,185 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>베이커리 POS</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      display: flex;
-      height: 100vh;
-    }
-    .menu {
-      width: 60%;
-      padding: 20px;
-      overflow-y: scroll;
-      background: #f8f8f8;
-    }
-    .menu-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px;
-      margin-bottom: 8px;
-      background: white;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .menu-item:hover {
-      background: #e8f0ff;
-    }
-    .cart {
-      width: 40%;
-      padding: 20px;
-      background: #fff;
-      border-left: 2px solid #ddd;
-      display: flex;
-      flex-direction: column;
-    }
-    .cart h2 {
-      margin-top: 0;
-    }
-    .cart-items {
-      flex: 1;
-      overflow-y: auto;
-    }
-    .cart-item {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-    .total {
-      font-size: 20px;
-      font-weight: bold;
-      margin-top: 10px;
-    }
-    button {
-      padding: 10px;
-      border: none;
-      background: #4CAF50;
-      color: white;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BAKERY POS</title>
+    <style>
+        :root {
+            --bg-color: #0f1014;
+            --card-bg: #1e2025;
+            --primary-blue: #3d8bff;
+            --accent-green: #2ecc71;
+            --text-white: #e0e0e0;
+            --item-red: #e74c3c;
+            --item-orange: #f39c12;
+        }
+
+        body { 
+            font-family: -apple-system, system-ui, sans-serif;
+            background: var(--bg-color); color: var(--text-white);
+            margin: 0; padding: 10px; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box;
+        }
+
+        h2 { text-align: center; margin: 5px 0; font-size: 1.2rem; color: var(--primary-blue); }
+
+        /* 메뉴 격자: 3열로 배치해서 더 많이 보이게 */
+        .menu-grid { 
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; 
+            overflow-y: auto; flex-shrink: 0; max-height: 55%; padding-bottom: 10px;
+        }
+
+        button.item-btn { 
+            height: 75px; border: none; border-radius: 12px;
+            background: var(--card-bg); color: var(--text-white);
+            font-size: 0.85rem; font-weight: 600; padding: 5px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            word-break: keep-all; line-height: 1.2;
+        }
+
+        button.item-btn:active { background: #444; transform: scale(0.95); }
+        .price-tag { font-size: 0.75rem; color: #aaa; margin-top: 4px; font-weight: 400; }
+
+        /* 세트나 특수메뉴 강조색 */
+        .special { border: 1px solid var(--item-orange) !important; }
+        .dubai { border: 1px solid var(--accent-green) !important; }
+
+        /* 영수증 영역 */
+        #cart { 
+            flex-grow: 1; background: #25282e; border-radius: 15px;
+            padding: 15px; overflow-y: auto; margin: 10px 0;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .cart-item { 
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 5px;
+            font-size: 0.95rem;
+        }
+
+        .item-delete { color: #ff3b30; font-size: 0.8rem; margin-left: 8px; }
+
+        /* 하단 결제창 */
+        .bottom-section { background: var(--bg-color); border-top: 1px solid #333; padding-top: 10px; }
+        .total-row { 
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 1.6rem; font-weight: 800; margin-bottom: 10px;
+        }
+
+        .pay-btn { 
+            width: 100%; height: 60px; border: none; border-radius: 15px;
+            background: var(--primary-blue); color: white;
+            font-size: 1.3rem; font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-  <div class="menu" id="menu"></div>
 
-  <div class="cart">
-    <h2>🧾 주문 목록</h2>
-    <div class="cart-items" id="cartItems"></div>
-    <div class="total" id="total">총합: 0원</div>
-    <button onclick="clearCart()">결제 완료</button>
-  </div>
+    <h2>🥖 BAKERY SMART POS</h2>
+    
+    <div class="menu-grid" id="menu-container">
+        </div>
 
-  <script>
-    const menuData = [
-      { name: "옥수수 크로와상", price: 6200 },
-      { name: "갈렛데로와", price: 6500 },
-      { name: "퀸아망", price: 5500 },
-      { name: "아몬드퀸아망", price: 5500 },
-      { name: "뺑스위스", price: 6200 },
-      { name: "에그타르트", price: 5500 },
-      { name: "쁘띠", price: 2300 },
-      { name: "부들크림빵", price: 8800 },
-      { name: "소금빵", price: 4000 },
-      { name: "에그베이컨", price: 4800 },
-      { name: "명란 감자", price: 4500 },
-      { name: "감자샐러드", price: 6200 },
-      { name: "시나몬 브리오슈", price: 5800 },
-      { name: "카푸치노초코", price: 6200 },
-      { name: "모카번", price: 5000 },
-      { name: "버터 소금 베이글", price: 4500 },
-      { name: "올리브 치즈 베이글", price: 5200 },
-      { name: "명란 치즈 바게트", price: 7300 },
-      { name: "바게트 샌드위치", price: 11500 },
-      { name: "당근라페 샌드위치", price: 11500 },
-      { name: "넛츠카라멜쇼콜라", price: 8800 },
-      { name: "초콜라 가또", price: 8300 },
-      { name: "바닐라/시트러스/말차가또", price: 7500 },
-      { name: "헤이즐넛 가또", price: 8000 },
-      { name: "마시멜로 브라우니", price: 5800 },
-      { name: "초코범벅", price: 6800 },
-      { name: "파이만쥬", price: 5500 },
-      { name: "상투과자", price: 5500 },
-      { name: "플레인 휘낭시에", price: 3000 },
-      { name: "유자롤케이크", price: 9800 },
-      { name: "당근케이크", price: 9000 },
-      { name: "딸기쫀득볼", price: 5800 },
-      { name: "두바이쫀득볼", price: 7800 }
-    ];
+    <div id="cart">
+        <div id="cart-list" style="color: #666; text-align: center; margin-top: 10px;">주문 대기 중...</div>
+    </div>
 
-    const menuDiv = document.getElementById("menu");
-    const cartItemsDiv = document.getElementById("cartItems");
-    const totalDiv = document.getElementById("total");
+    <div class="bottom-section">
+        <div class="total-row">
+            <span style="font-size: 1rem; color: #888;">TOTAL</span>
+            <span id="total-price" style="color: var(--accent-green);">0원</span>
+        </div>
+        <button class="pay-btn" onclick="processPayment()">결제하기</button>
+        <div style="text-align: center; margin-top: 8px;">
+            <span onclick="resetCart()" style="color: #666; font-size: 0.8rem; text-decoration: underline;">전체취소</span>
+        </div>
+    </div>
 
-    let cart = [];
+    <script>
+        // 메뉴 데이터 (이름, 가격, 특수표시)
+        const menuData = [
+            ["옥수수 크로와상", 6200], ["갈렛데로와", 6500], ["퀸아망", 5500],
+            ["아몬드퀸아망", 5500], ["뺑스위스", 6200], ["에그타르트", 5500],
+            ["쁘띠 1개", 2300], ["쁘띠 3개", 6200], ["부들크림빵", 8800],
+            ["소금빵", 4000], ["에그베이컨", 4800], ["명란 감자", 4500],
+            ["감자샐러드", 6200], ["누룽지 쑥 팥빵", 5500], ["인절미 쑥 팥빵", 5800],
+            ["호두크림 치즈찰빵", 6500], ["시나몬 브리오슈", 5800], ["카푸치노초코", 6200],
+            ["빵드 카카오", 6800], ["모카번", 5000], ["모카앙금빵", 6800],
+            ["버터 소금 베이글", 4500], ["올리브 치즈 베이글", 5200], ["쪽파 크림치즈 프레첼", 6800],
+            ["명란 치즈 바게트", 7300], ["BTB 바게트", 7500], ["파리의 연인", 6800],
+            ["바게트 샌드위치", 11500], ["당근라페 샌드위치", 11500], ["넛츠카라멜쇼콜라", 8800],
+            ["초콜라 가또", 8300], ["바닐라/시트러스 가또", 7500], ["헤이즐넛 가또", 8000],
+            ["마시멜로 브라우니", 5800], ["초코범벅", 6800], ["파이만쥬", 5500],
+            ["상투과자", 5500], ["플레인 휘낭시에 1개", 3000], ["플레인 휘낭시에 4개", 10000],
+            ["스페셜 휘낭시에 1개", 3500], ["스페셜 휘낭시에 3개", 10000], ["유자롤케이크", 9800],
+            ["당근케이크", 9000], ["딸기쫀득볼", 5800], ["두바이쫀득볼", 7800, "dubai"],
+            ["왕두바이쫀득볼", 15300, "dubai"], ["이태리쫀득볼", 7300], ["마다가스카르쫀득볼", 7300],
+            ["두바이식 꼬마김밥", 31800, "dubai"], ["두바이+딸기쫀득", 13100, "special"],
+            ["두바이+딸기+부들", 21400, "special"]
+        ];
 
-    function renderMenu() {
-      menuData.forEach(item => {
-        const div = document.createElement("div");
-        div.className = "menu-item";
-        div.innerHTML = `<span>${item.name}</span><span>${item.price.toLocaleString()}원</span>`;
-        div.onclick = () => addToCart(item);
-        menuDiv.appendChild(div);
-      });
-    }
+        let cartItems = {};
+        let total = 0;
 
-    function addToCart(item) {
-      cart.push(item);
-      renderCart();
-    }
+        // 메뉴판 생성
+        const menuContainer = document.getElementById('menu-container');
+        menuData.forEach(item => {
+            const btn = document.createElement('button');
+            btn.className = 'item-btn ' + (item[2] || '');
+            btn.innerHTML = `<span>${item[0]}</span><span class="price-tag">${item[1].toLocaleString()}</span>`;
+            btn.onclick = () => addToCart(item[0], item[1]);
+            menuContainer.appendChild(btn);
+        });
 
-    function renderCart() {
-      cartItemsDiv.innerHTML = "";
-      let total = 0;
+        function addToCart(name, price) {
+            if (cartItems[name]) {
+                cartItems[name].count++;
+            } else {
+                cartItems[name] = { price: price, count: 1 };
+            }
+            updateDisplay();
+        }
 
-      cart.forEach((item, index) => {
-        total += item.price;
-        const div = document.createElement("div");
-        div.className = "cart-item";
-        div.innerHTML = `
-          <span>${item.name}</span>
-          <span>${item.price.toLocaleString()}원</span>
-        `;
-        cartItemsDiv.appendChild(div);
-      });
+        function updateDisplay() {
+            const listDiv = document.getElementById('cart-list');
+            const totalDiv = document.getElementById('total-price');
+            
+            if (Object.keys(cartItems).length === 0) {
+                listDiv.innerHTML = "주문 대기 중...";
+                totalDiv.innerText = "0원";
+                total = 0;
+                return;
+            }
 
-      totalDiv.innerText = `총합: ${total.toLocaleString()}원`;
-    }
+            let html = "";
+            total = 0;
+            for (const name in cartItems) {
+                const item = cartItems[name];
+                const itemTotal = item.price * item.count;
+                total += itemTotal;
+                html += `
+                    <div class="cart-item">
+                        <span>${name} <small style="color:#888">x${item.count}</small></span>
+                        <span>${itemTotal.toLocaleString()}원</span>
+                    </div>`;
+            }
+            listDiv.innerHTML = html;
+            totalDiv.innerText = total.toLocaleString() + "원";
+            // 자동 스크롤 하단으로
+            document.getElementById('cart').scrollTop = document.getElementById('cart').scrollHeight;
+        }
 
-    function clearCart() {
-      cart = [];
-      renderCart();
-      alert("결제 완료!");
-    }
+        function processPayment() {
+            if (total === 0) return;
+            alert(`✅ 결제 완료\n총액: ${total.toLocaleString()}원`);
+            resetCart();
+        }
 
-    renderMenu();
-  </script>
+        function resetCart() {
+            cartItems = {};
+            updateDisplay();
+        }
+    </script>
 </body>
 </html>
