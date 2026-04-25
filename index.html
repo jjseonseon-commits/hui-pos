@@ -1,188 +1,263 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BAKERY POS</title>
-    <style>
-        :root {
-            --bg-color: #f8f9fa;
-            --card-bg: #ffffff;
-            --primary-blue: #007AFF;
-            --accent-green: #28a745;
-            --text-black: #1d1d1f;
-            --text-gray: #6e6e73;
-            --border-color: #d2d2d7;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>BAKERY POS</title>
+  <style>
+    :root {
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --primary-blue: #007AFF;
+      --accent-green: #28a745;
+      --text-black: #1d1d1f;
+      --text-gray: #6e6e73;
+      --border-color: #d2d2d7;
+    }
 
-        * { box-sizing: border-box; } /* 테두리 포함 크기 계산 (스크롤 방지) */
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        body { 
-            font-family: -apple-system, system-ui, sans-serif;
-            background: var(--bg-color); color: var(--text-black);
-            margin: 0; padding: 8px; /* 여백 축소 */
-            display: flex; flex-direction: column; height: 100vh; 
-            overflow-x: hidden; /* 좌우 스크롤 방지 */
-        }
+    body {
+      font-family: -apple-system, system-ui, sans-serif;
+      background: var(--bg-color); color: var(--text-black);
+      margin: 0; padding: 8px; display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+    }
 
-        h2 { text-align: center; margin: 5px 0; font-size: 1.1rem; font-weight: 800; }
+    h2 { text-align: center; margin: 5px 0; font-size: 1.1rem; font-weight: 800; }
 
-        /* 메뉴 격자 */
-        .menu-grid { 
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; 
-            overflow-y: auto; flex-shrink: 0; max-height: 55%; padding-bottom: 10px;
-            width: 100%;
-        }
+    /* 메뉴 격자 */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px; /* 간격을 더 줄임 */
+      overflow-y: auto;
+      flex-shrink: 0;
+      max-height: 62%; /* 메뉴 영역 비중을 높임 (기존 52%) */
+      padding-bottom: 5px;
+    }
 
-        button.item-btn { 
-            height: 75px; border: 1px solid var(--border-color); border-radius: 10px;
-            background: var(--card-bg); color: var(--text-black);
-            font-size: 0.95rem; font-weight: 700; padding: 2px;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            word-break: keep-all; line-height: 1.2;
-        }
+    button.item-btn {
+      height: 65px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: var(--card-bg);
+      color: var(--text-black);
+      font-size: 0.9rem; /* 글자 크기 아주 살짝 조정 */
+      font-weight: 700;
+      padding: 2px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
 
-        button.item-btn:active { background: #f2f2f7; transform: scale(0.95); }
-        .price-tag { font-size: 0.72rem; color: var(--text-gray); margin-top: 4px; font-weight: 500; }
+    button.item-btn:active { background: #f2f2f7; transform: scale(0.95); }
+    .price-tag { font-size: 0.72rem; color: var(--text-gray); margin-top: 4px; font-weight: 500; }
 
-        .special { border: 2px solid #ff9500 !important; }
-        .dubai { border: 2px solid #34c759 !important; }
+    .special { border: 2px solid #ff9500 !important; }
+    .dubai { border: 2px solid #34c759 !important; }
 
-        /* 주문 목록 영역 */
-        #cart { 
-            flex-grow: 1; background: #ffffff; border-radius: 15px;
-            padding: 12px; overflow-y: auto; margin: 8px 0;
-            border: 1px solid var(--border-color);
-        }
+    /* 하단 주문 미리보기 영역 */
+    #cart {
+      flex-grow: 1;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 8px;
+      overflow-y: auto;
+      margin: 5px 0; /* 여백 축소 */
+      border: 1px solid var(--border-color);
+      min-height: 80px; /* 최소 높이 지정 */
+    }
 
-        .cart-item { 
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 8px; border-bottom: 1px solid #f2f2f7; padding: 8px 0;
-            font-size: 1rem;
-            animation: fadeIn 0.2s;
-        }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .cart-item {
+      display: flex;
+      justify-content: center; /* 중앙 정렬 느낌으로 */
+      align-items: center;
+      margin-bottom: 4px;
+      border-bottom: none; /* 가로 선 제거 */
+      padding: 2px 0;
+      font-size: 0.9rem;
+      color: grey;
+    }
 
-        .item-info { flex-grow: 1; display: flex; justify-content: space-between; margin-right: 10px; }
-        .del-btn { color: #ff3b30; font-size: 0.8rem; border: 1px solid #ff3b30; border-radius: 5px; padding: 2px 6px; }
+    .divider {
+      margin: 0 10px;
+      color: var(--border-color);
+      font-weight: normal;
+    }
 
-        /* 하단 합계 및 리셋 */
-        .bottom-section { background: var(--bg-color); }
-        .total-row { 
-            display: flex; justify-content: space-between; align-items: center;
-            font-size: 1.6rem; font-weight: 800; margin-bottom: 8px;
-        }
+    /* 하단 버튼 영역 */
+    .bottom-section { display: flex; flex-direction: column; gap: 8px; }
+    .total-row { display: flex; justify-content: space-between; align-items: center; font-size: 1.5rem; font-weight: 800; }
 
-        .reset-btn { 
-            width: 100%; height: 60px; border: none; border-radius: 15px;
-            background: var(--text-black); color: white; /* 검정 배경으로 깔끔하게 */
-            font-size: 1.3rem; font-weight: bold;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-        .reset-btn:active { opacity: 0.8; transform: scale(0.98); }
-    </style>
+    .btn-group {
+      display: grid;
+      /* 7:3 비율로 나누기 */
+      grid-template-columns: 7fr 3fr;
+      gap: 8px;
+    }
+
+    .reset-btn {
+      height: 55px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      background: #eee;
+      font-weight: bold;
+      font-size: 1.1rem; /* 초기화 글자를 조금 더 강조 */
+    }
+
+    .view-btn {
+      height: 55px;
+      border-radius: 12px;
+      border: none;
+      background: var(--text-black);
+      color: white;
+      font-weight: bold;
+      font-size: 0.95rem; /* 목록보기는 칸이 좁아졌으니 살짝 줄임 */
+    }
+
+    /* [핵심] 전체 화면 목록 보기 창 */
+    #full-list-view {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: white; z-index: 100; display: none; /* 평소엔 숨김 */
+      flex-direction: column; padding: 20px;
+    }
+
+    .view-header { display: flex; align-items: center; margin-bottom: 20px; }
+    .back-btn { font-size: 2rem; background: none; border: none; padding: 0 15px 0 0; cursor: pointer; }
+
+    .full-items-container { flex-grow: 1; overflow-y: auto; font-size: 1.2rem; }
+    .full-total { border-top: 2px solid var(--text-black); padding-top: 15px; font-size: 2rem; font-weight: 800; text-align: right; }
+  </style>
 </head>
 <body>
 
-    <h2>🥖 BAKERY SMART POS</h2>
-    
-    <div class="menu-grid" id="menu-container"></div>
 
-    <div id="cart">
-        <div id="cart-list" style="color: #999; text-align: center; margin-top: 10px; font-size: 0.9rem;">
-            목록을 터치하면 삭제됩니다.
-        </div>
-    </div>
+<div class="menu-grid" id="menu-container"></div>
 
-    <div class="bottom-section">
-        <div class="total-row">
-            <span style="font-size: 0.9rem; color: #888;">TOTAL</span>
-            <span id="total-price" style="color: var(--accent-green);">0원</span>
-        </div>
-        <button class="reset-btn" onclick="resetCart()">초기화</button>
-    </div>
+<div id="cart">
+  <div id="cart-list" style="color: #999; text-align: center; margin-top: 10px; font-size: 0.8rem;">항목 터치 시 삭제</div>
+</div>
 
-    <script>
-        const menuData = [
-            ["옥수수 크로와상", 6200], ["갈렛데로와", 6500], ["퀸아망", 5500],
-            ["아몬드퀸아망", 5500], ["뺑스위스", 6200], ["에그타르트", 5500],
-            ["쁘띠 1개", 2300], ["쁘띠 3개", 6200], ["부들크림빵", 8800],
-            ["소금빵", 4000], ["에그베이컨", 4800], ["명란 감자", 4500],
-            ["감자샐러드", 6200], ["누룽지 쑥 팥빵", 5500], ["인절미 쑥 팥빵", 5800],
-            ["호두크림 치즈찰빵", 6500], ["시나몬 브리오슈", 5800], ["카푸치노초코", 6200],
-            ["빵드 카카오", 6800], ["모카번", 5000], ["모카앙금빵", 6800],
-            ["버터 소금 베이글", 4500], ["올리브 치즈 베이글", 5200], ["쪽파 크림치즈 프레첼", 6800],
-            ["명란 치즈 바게트", 7300], ["BTB 바게트", 7500], ["파리의 연인", 6800],
-            ["바게트 샌드위치", 11500], ["당근라페 샌드위치", 11500], ["넛츠카라멜쇼콜라", 8800],
-            ["초콜라 가또", 8300], ["바닐라/시트러스 가또", 7500], ["헤이즐넛 가또", 8000],
-            ["마시멜로 브라우니", 5800], ["초코범벅", 6800], ["파이만쥬", 5500],
-            ["상투과자", 5500], ["플레인 휘낭시에 1개", 3000], ["플레인 휘낭시에 4개", 10000],
-            ["스페셜 휘낭시에 1개", 3500], ["스페셜 휘낭시에 3개", 10000], ["유자롤케이크", 9800],
-            ["당근케이크", 9000], ["딸기쫀득볼", 5800], ["두바이쫀득볼", 7800, "dubai"],
-            ["왕두바이쫀득볼", 15300, "dubai"], ["이태리쫀득볼", 7300], ["마다가스카르쫀득볼", 7300],
-            ["두바이식 꼬마김밥", 31800, "dubai"], ["두바이+딸기쫀득", 13100, "special"],
-            ["두바이+딸기+부들", 21400, "special"]
-        ];
+<div class="bottom-section">
+  <div class="total-row">
+    <span style="font-size: 0.9rem; color: #888;">TOTAL</span>
+    <span id="total-price" style="color: var(--accent-green);">0원</span>
+  </div>
+  <div class="btn-group">
+    <button class="reset-btn" onclick="resetCart()">초기화</button>
+    <button class="view-btn" onclick="showFullList()">목록보기</button>
+  </div>
+</div>
 
-        let cartItems = []; // 개별 삭제를 위해 배열로 변경
+<div id="full-list-view">
+  <div class="view-header">
+    <button class="back-btn" onclick="hideFullList()">〈</button>
+    <span style="font-size: 1.5rem; font-weight: 800;">주문서 상세</span>
+  </div>
+  <div class="full-items-container" id="full-items-content">
+  </div>
+  <div class="full-total" id="full-total-price">
+    0원
+  </div>
+</div>
 
-        const menuContainer = document.getElementById('menu-container');
-        menuData.forEach(item => {
-            const btn = document.createElement('button');
-            btn.className = 'item-btn ' + (item[2] || '');
-            btn.innerHTML = `<span>${item[0]}</span><span class="price-tag">${item[1].toLocaleString()}원</span>`;
-            btn.onclick = () => addToCart(item[0], item[1]);
-            menuContainer.appendChild(btn);
-        });
+<script>
+  const menuData = [
+    ["옥수수 크로와상", 6200], ["갈렛데로와", 6500], ["퀸아망", 5500], ["아몬드퀸아망", 5500], ["뺑스위스", 6200], ["에그타르트", 5500],
+    ["쁘띠 1개", 2300], ["쁘띠 3개", 6200], ["부들크림빵", 8800], ["소금빵", 4000], ["에그베이컨", 4800], ["명란 감자", 4500],
+    ["감자샐러드", 6200], ["누룽지 쑥 팥빵", 5500], ["인절미 쑥 팥빵", 5800], ["호두크림 치즈찰빵", 6500], ["시나몬 브리오슈", 5800], ["카푸치노초코", 6200],
+    ["빵드 카카오", 6800], ["모카번", 5000], ["모카앙금빵", 6800], ["버터 소금 베이글", 4500], ["올리브 치즈 베이글", 5200], ["쪽파 크림치즈 프레첼", 6800],
+    ["명란 치즈 바게트", 7300], ["BTB 바게트", 7500], ["파리의 연인", 6800], ["바게트 샌드위치", 11500], ["당근라페 샌드위치", 11500], ["넛츠카라멜쇼콜라", 8800],
+    ["초콜라 가또", 8300], ["바닐라/시트러스 가또", 7500], ["헤이즐넛 가또", 8000], ["마시멜로 브라우니", 5800], ["초코범벅", 6800], ["파이만쥬", 5500],
+    ["상투과자", 5500], ["플레인 휘낭시에 1개", 3000], ["플레인 휘낭시에 4개", 10000], ["스페셜 휘낭시에 1개", 3500], ["스페셜 휘낭시에 3개", 10000], ["유자롤케이크", 9800],
+    ["당근케이크", 9000], ["딸기쫀득볼", 5800], ["두바이쫀득볼", 7800, "dubai"], ["왕두바이쫀득볼", 15300, "dubai"], ["이태리쫀득볼", 7300], ["마다가스카르쫀득볼", 7300],
+    ["두바이식 꼬마김밥", 31800, "dubai"], ["두바이+딸기쫀득", 13100, "special"], ["두바이+딸기+부들", 21400, "special"]
+  ];
 
-        function addToCart(name, price) {
-            cartItems.push({ name, price, id: Date.now() + Math.random() });
-            updateDisplay();
-        }
+  let cartItems = [];
+  let total = 0;
 
-        function removeItem(id) {
-            cartItems = cartItems.filter(item => item.id !== id);
-            updateDisplay();
-        }
+  const menuContainer = document.getElementById('menu-container');
+  menuData.forEach(item => {
+    const btn = document.createElement('button');
+    btn.className = 'item-btn ' + (item[2] || '');
+    btn.innerHTML = `<span>${item[0]}</span><span class="price-tag">${item[1].toLocaleString()}원</span>`;
+    btn.onclick = () => addToCart(item[0], item[1]);
+    menuContainer.appendChild(btn);
+  });
 
-        function updateDisplay() {
-            const listDiv = document.getElementById('cart-list');
-            const totalDiv = document.getElementById('total-price');
-            
-            if (cartItems.length === 0) {
-                listDiv.innerHTML = '<div style="color: #999; text-align: center; margin-top: 10px; font-size: 0.9rem;">목록을 터치하면 삭제됩니다.</div>';
-                totalDiv.innerText = "0원";
-                return;
-            }
+  function addToCart(name, price) {
+    cartItems.push({ name, price, id: Date.now() + Math.random() });
+    updateDisplay();
+  }
 
-            let html = "";
-            let total = 0;
-            
-            cartItems.forEach(item => {
-                total += item.price;
-                html += `
-                    <div class="cart-item" onclick="removeItem(${item.id})">
-                        <div class="item-info">
-                            <span>${item.name}</span>
-                            <span style="font-weight:600;">${item.price.toLocaleString()}원</span>
-                        </div>
-                        <div class="del-btn">삭제</div>
-                    </div>`;
-            });
-            
-            listDiv.innerHTML = html;
-            totalDiv.innerText = total.toLocaleString() + "원";
-            document.getElementById('cart').scrollTop = document.getElementById('cart').scrollHeight;
-        }
+  function removeItem(id) {
+    cartItems = cartItems.filter(item => item.id !== id);
+    updateDisplay();
+  }
 
-        function resetCart() {
-            if (cartItems.length === 0) return;
-            if (confirm("주문 목록을 모두 초기화하시겠습니까?")) {
-                cartItems = [];
-                updateDisplay();
-            }
-        }
-    </script>
+  function updateDisplay() {
+    const listDiv = document.getElementById('cart-list');
+    const totalDiv = document.getElementById('total-price');
+    total = 0;
+
+    if (cartItems.length === 0) {
+      listDiv.innerHTML = '<div style="color:#999;text-align:center;margin-top:10px;">항목 터치 시 삭제</div>';
+      totalDiv.innerText = "0원";
+      return;
+    }
+
+    let html = "";
+    cartItems.forEach(item => {
+      total += item.price;
+      html += `
+    <div class="cart-item" onclick="removeItem(${item.id})">
+        <span>${item.name}</span>
+        <span class="divider">|</span>
+        <span style="font-weight:600;">${item.price.toLocaleString()}</span>
+    </div>`;
+     });
+    listDiv.innerHTML = html;
+    totalDiv.innerText = total.toLocaleString() + "원";
+    document.getElementById('cart').scrollTop = document.getElementById('cart').scrollHeight;
+  }
+
+  function showFullList() {
+    if (cartItems.length === 0) return;
+    const content = document.getElementById('full-items-content');
+    let html = "";
+
+    cartItems.forEach(item => {
+      // 상세 목록에서도 클릭하면 삭제되도록 removeItem 함수 연결
+      html += `
+    <div onclick="removeItemFromFullView(${item.id})"
+         style="display:flex; justify-content:center; margin-bottom:15px; cursor:pointer; font-size:1.2rem;">
+        <span>${item.name}</span>
+        <span style="margin: 0 15px; color:#ccc;">|</span>
+        <span style="font-weight:600;">${item.price.toLocaleString()}</span>
+    </div>`;
+    });
+
+    content.innerHTML = html;
+    document.getElementById('full-total-price').innerText = total.toLocaleString() + "원";
+    document.getElementById('full-list-view').style.display = 'flex';
+  }
+
+  // 목록보기 전용 삭제 보조 함수 (삭제 후 화면 갱신을 위해)
+  function removeItemFromFullView(id) {
+    removeItem(id); // 기존 삭제 로직 실행
+    showFullList(); // 상세 목록 화면 다시 그리기 (금액 업데이트)
+  }
+
+  function hideFullList() {
+    document.getElementById('full-list-view').style.display = 'none';
+  }
+
+  function resetCart() {
+      cartItems = [];
+      updateDisplay();
+  }
+</script>
 </body>
 </html>
