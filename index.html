@@ -20,7 +20,25 @@
     body {
       font-family: -apple-system, system-ui, sans-serif;
       background: var(--bg-color); color: var(--text-black);
-      margin: 0; padding: 8px; display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+      margin: 0; padding: 8px;
+      /* 화면 높이를 꽉 채우고 절대 밖으로 안 나가게 설정 */
+      display: flex; flex-direction: column;
+      height: 100dvh; /* 최신 아이폰 주소창 높이까지 계산한 단위 */
+      overflow: hidden;
+    }
+
+    * {
+      /* 모든 요소에서 터치로 인한 지연과 확대를 방지 */
+      touch-action: manipulation;
+
+      /* 텍스트를 길게 눌렀을 때 선택되는 것도 막고 싶다면 추가 (선택사항) */
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    /* 입력창 등이 있다면 거기서는 글을 써야 하니 예외 처리 (필요시) */
+    input, textarea {
+      user-select: auto;
     }
 
     h2 { text-align: center; margin: 5px 0; font-size: 1.1rem; font-weight: 800; }
@@ -29,11 +47,11 @@
     .menu-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 4px; /* 간격을 더 줄임 */
-      overflow-y: auto;
-      flex-shrink: 0;
-      max-height: 62%; /* 메뉴 영역 비중을 높임 (기존 52%) */
-      padding-bottom: 5px;
+      gap: 4px;
+      overflow-y: auto; /* 메뉴가 많으면 이 안에서만 스크롤 */
+      flex: 1 1 auto; /* 유연하게 늘어나도록 설정 */
+      min-height: 0; /* flex 박스 안에서 스크롤 작동을 위한 필수 설정 */
+      margin-bottom: 5px;
     }
 
     button.item-btn {
@@ -59,35 +77,40 @@
 
     /* 하단 주문 미리보기 영역 */
     #cart {
-      flex-grow: 1;
+      flex: 0 0 120px; /* 높이를 85px로 딱 고정해서 버튼을 안 밀어내게 함 */
       background: #ffffff;
       border-radius: 12px;
-      padding: 8px;
+      padding: 5px 10px;
       overflow-y: auto;
-      margin: 5px 0; /* 여백 축소 */
       border: 1px solid var(--border-color);
-      min-height: 80px; /* 최소 높이 지정 */
+      margin-bottom: 8px;
     }
 
     .cart-item {
       display: flex;
-      justify-content: center; /* 중앙 정렬 느낌으로 */
+      justify-content: center;
       align-items: center;
-      margin-bottom: 4px;
-      border-bottom: none; /* 가로 선 제거 */
-      padding: 2px 0;
-      font-size: 0.9rem;
-      color: grey;
+      margin-bottom: 2px;
+      border-bottom: none;
+      padding: 3px 0;
+      /* 기존 0.9rem에서 1.2rem으로 약 1.3배 확대 */
+      font-size: 1.1rem;
+      font-weight: 700; /* 글자가 커진 만큼 두께감도 추가 */
+      color: dimgray;
     }
 
     .divider {
-      margin: 0 10px;
-      color: var(--border-color);
-      font-weight: normal;
+      margin: 0 12px;
+      color: #d2d2d7;
+      font-weight: 300;
+      font-size: 1.1rem;
     }
 
     /* 하단 버튼 영역 */
-    .bottom-section { display: flex; flex-direction: column; gap: 8px; }
+    .bottom-section {
+      flex: 0 0 auto; /* 자기 크기만큼만 차지 */
+      padding-bottom: env(safe-area-inset-bottom); /* 아이폰 하단 바 여백 확보 */
+    }
     .total-row { display: flex; justify-content: space-between; align-items: center; font-size: 1.5rem; font-weight: 800; }
 
     .btn-group {
