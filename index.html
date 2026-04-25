@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나의 미니 포스기</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 20px; background: #f4f4f9; }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        button { padding: 20px; font-size: 18px; border: none; border-radius: 10px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        button:active { background: #ddd; }
+        #cart { margin-top: 20px; padding: 15px; background: #fff; border-radius: 10px; min-height: 100px; }
+        .total { font-size: 24px; font-weight: bold; color: blue; margin-top: 10px; }
+        .pay-btn { width: 100%; background: #28a745; color: white; margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h2>🍎 미니 포스기</h2>
+    
+    <div class="menu-grid">
+        <button onclick="add(5000, '아메리카노')">☕ 아메리카노<br>5,000원</button>
+        <button onclick="add(5500, '라떼')">🥛 라떼<br>5,500원</button>
+        <button onclick="add(3000, '쿠키')">🍪 쿠키<br>3,000원</button>
+        <button onclick="add(4500, '베이글')">🥯 베이글<br>4,500원</button>
+    </div>
+
+    <div id="cart">
+        <div id="items">담긴 상품이 없습니다.</div>
+        <div class="total">합계: <span id="total-price">0</span>원</div>
+    </div>
+
+    <button class="pay-btn" onclick="pay()">결제하기 (초기화)</button>
+
+    <script>
+        let total = 0;
+        let itemList = [];
+
+        function add(price, name) {
+            total += price;
+            itemList.push(name);
+            document.getElementById('total-price').innerText = total.toLocaleString();
+            document.getElementById('items').innerText = itemList.join(', ');
+        }
+
+        function pay() {
+            if(total === 0) return;
+            alert(total.toLocaleString() + "원 결제 완료!");
+            total = 0;
+            itemList = [];
+            document.getElementById('total-price').innerText = "0";
+            document.getElementById('items').innerText = "담긴 상품이 없습니다.";
+        }
+    </script>
+</body>
+</html>
