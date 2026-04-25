@@ -6,62 +6,60 @@
     <title>BAKERY POS</title>
     <style>
         :root {
-            --bg-color: #0f1014;
-            --card-bg: #1e2025;
-            --primary-blue: #3d8bff;
-            --accent-green: #2ecc71;
-            --text-white: #e0e0e0;
-            --item-red: #e74c3c;
-            --item-orange: #f39c12;
+            --bg-color: #f8f9fa; /* 연한 회색 배경 */
+            --card-bg: #ffffff; /* 버튼 흰색 */
+            --primary-blue: #007AFF; /* 포인트 컬러 */
+            --accent-green: #28a745; /* 합계 컬러 */
+            --text-black: #1d1d1f; /* 메인 글자색 */
+            --text-gray: #6e6e73; /* 가격 글자색 */
+            --border-color: #d2d2d7;
         }
 
         body { 
             font-family: -apple-system, system-ui, sans-serif;
-            background: var(--bg-color); color: var(--text-white);
+            background: var(--bg-color); color: var(--text-black);
             margin: 0; padding: 10px; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box;
         }
 
-        h2 { text-align: center; margin: 5px 0; font-size: 1.2rem; color: var(--primary-blue); }
+        h2 { text-align: center; margin: 5px 0; font-size: 1.2rem; color: var(--text-black); font-weight: 800; }
 
-        /* 메뉴 격자: 3열로 배치해서 더 많이 보이게 */
+        /* 메뉴 격자 */
         .menu-grid { 
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; 
             overflow-y: auto; flex-shrink: 0; max-height: 55%; padding-bottom: 10px;
         }
 
         button.item-btn { 
-            height: 75px; border: none; border-radius: 12px;
-            background: var(--card-bg); color: var(--text-white);
-            font-size: 0.85rem; font-weight: 600; padding: 5px;
+            height: 80px; border: 1px solid var(--border-color); border-radius: 12px;
+            background: var(--card-bg); color: var(--text-black);
+            font-size: 1.05rem; font-weight: 700; padding: 5px; /* 이름 크기 키움 */
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             word-break: keep-all; line-height: 1.2;
         }
 
-        button.item-btn:active { background: #444; transform: scale(0.95); }
-        .price-tag { font-size: 0.75rem; color: #aaa; margin-top: 4px; font-weight: 400; }
+        button.item-btn:active { background: #f2f2f7; transform: scale(0.95); }
+        .price-tag { font-size: 0.75rem; color: var(--text-gray); margin-top: 5px; font-weight: 500; } /* 가격 진회색 */
 
-        /* 세트나 특수메뉴 강조색 */
-        .special { border: 1px solid var(--item-orange) !important; }
-        .dubai { border: 1px solid var(--accent-green) !important; }
+        /* 테두리 강조 메뉴 */
+        .special { border: 2px solid #ff9500 !important; }
+        .dubai { border: 2px solid #34c759 !important; }
 
         /* 영수증 영역 */
         #cart { 
-            flex-grow: 1; background: #25282e; border-radius: 15px;
+            flex-grow: 1; background: #ffffff; border-radius: 15px;
             padding: 15px; overflow-y: auto; margin: 10px 0;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            border: 1px solid var(--border-color);
         }
 
         .cart-item { 
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 5px;
+            margin-bottom: 8px; border-bottom: 1px solid #f2f2f7; padding-bottom: 5px;
             font-size: 0.95rem;
         }
 
-        .item-delete { color: #ff3b30; font-size: 0.8rem; margin-left: 8px; }
-
         /* 하단 결제창 */
-        .bottom-section { background: var(--bg-color); border-top: 1px solid #333; padding-top: 10px; }
+        .bottom-section { background: var(--bg-color); padding-top: 5px; }
         .total-row { 
             display: flex; justify-content: space-between; align-items: center;
             font-size: 1.6rem; font-weight: 800; margin-bottom: 10px;
@@ -71,6 +69,7 @@
             width: 100%; height: 60px; border: none; border-radius: 15px;
             background: var(--primary-blue); color: white;
             font-size: 1.3rem; font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,122,255,0.3);
         }
     </style>
 </head>
@@ -82,22 +81,21 @@
         </div>
 
     <div id="cart">
-        <div id="cart-list" style="color: #666; text-align: center; margin-top: 10px;">주문 대기 중...</div>
+        <div id="cart-list" style="color: #999; text-align: center; margin-top: 10px;">주문 대기 중...</div>
     </div>
 
     <div class="bottom-section">
         <div class="total-row">
-            <span style="font-size: 1rem; color: #888;">TOTAL</span>
+            <span style="font-size: 0.9rem; color: #888;">TOTAL</span>
             <span id="total-price" style="color: var(--accent-green);">0원</span>
         </div>
         <button class="pay-btn" onclick="processPayment()">결제하기</button>
-        <div style="text-align: center; margin-top: 8px;">
-            <span onclick="resetCart()" style="color: #666; font-size: 0.8rem; text-decoration: underline;">전체취소</span>
+        <div style="text-align: center; margin-top: 12px;">
+            <span onclick="resetCart()" style="color: #999; font-size: 0.85rem; text-decoration: underline;">전체취소</span>
         </div>
     </div>
 
     <script>
-        // 메뉴 데이터 (이름, 가격, 특수표시)
         const menuData = [
             ["옥수수 크로와상", 6200], ["갈렛데로와", 6500], ["퀸아망", 5500],
             ["아몬드퀸아망", 5500], ["뺑스위스", 6200], ["에그타르트", 5500],
@@ -122,12 +120,11 @@
         let cartItems = {};
         let total = 0;
 
-        // 메뉴판 생성
         const menuContainer = document.getElementById('menu-container');
         menuData.forEach(item => {
             const btn = document.createElement('button');
             btn.className = 'item-btn ' + (item[2] || '');
-            btn.innerHTML = `<span>${item[0]}</span><span class="price-tag">${item[1].toLocaleString()}</span>`;
+            btn.innerHTML = `<span>${item[0]}</span><span class="price-tag">${item[1].toLocaleString()}원</span>`;
             btn.onclick = () => addToCart(item[0], item[1]);
             menuContainer.appendChild(btn);
         });
@@ -160,13 +157,12 @@
                 total += itemTotal;
                 html += `
                     <div class="cart-item">
-                        <span>${name} <small style="color:#888">x${item.count}</small></span>
-                        <span>${itemTotal.toLocaleString()}원</span>
+                        <span>${name} <small style="color:#888; font-weight:normal;">x${item.count}</small></span>
+                        <span style="font-weight:600;">${itemTotal.toLocaleString()}원</span>
                     </div>`;
             }
             listDiv.innerHTML = html;
             totalDiv.innerText = total.toLocaleString() + "원";
-            // 자동 스크롤 하단으로
             document.getElementById('cart').scrollTop = document.getElementById('cart').scrollHeight;
         }
 
